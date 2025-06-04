@@ -1,0 +1,7 @@
+[virtualenvs]
+create = true
+in-project = true
+
+# Configuração de plugins
+[plugins]
+export = "poetry-plugin-export"
