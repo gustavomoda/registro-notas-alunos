@@ -33,26 +33,90 @@ class TestDisciplinaService:
     def test_criar_sucesso(self):
         """Testa criação de disciplina com sucesso"""
         mock_db = Mock()
-        mock_db.execute_query.return_value = [(1,)]
+        mock_db.execute_query.side_effect = [
+            [],  # buscar_por_nome_ano_semestre retorna vazio (não existe)
+            [(1,)],  # insert retorna ID criado
+        ]
 
         service = DisciplinaService(mock_db)
         id_criado = service.criar(nome="Matemática", ano=2024, semestre=1)
 
         assert id_criado == 1
-        mock_db.execute_query.assert_called_once()
-        args = mock_db.execute_query.call_args
-        assert "INSERT INTO disciplina" in args[0][0]
-        assert args[0][1] == ("Matemática", 2024, 1)
+        assert mock_db.execute_query.call_count == 2
+        # Primeira chamada: buscar_por_nome_ano_semestre
+        buscar_call = mock_db.execute_query.call_args_list[0]
+        assert (
+            "SELECT id, nome, ano, semestre FROM disciplina "
+            "WHERE nome = %s AND ano = %s AND semestre = %s"
+        ) in buscar_call[0][0]
+        assert buscar_call[0][1] == ("Matemática", 2024, 1)
+        # Segunda chamada: insert
+        insert_call = mock_db.execute_query.call_args_list[1]
+        assert "INSERT INTO disciplina" in insert_call[0][0]
+        assert insert_call[0][1] == ("Matemática", 2024, 1)
+
+    def test_criar_disciplina_ja_existe(self):
+        """Testa criação de disciplina que já existe"""
+        mock_db = Mock()
+        mock_db.execute_query.return_value = [
+            (1, "Matemática", 2024, 1)
+        ]  # disciplina já existe
+
+        service = DisciplinaService(mock_db)
+
+        with pytest.raises(Exception, match="Disciplina já existe"):
+            service.criar(nome="Matemática", ano=2024, semestre=1)
 
     def test_criar_sem_resultado(self):
         """Testa criação que falha sem retornar resultado"""
         mock_db = Mock()
-        mock_db.execute_query.return_value = []
+        mock_db.execute_query.side_effect = [
+            [],  # buscar_por_nome_ano_semestre retorna vazio
+            [],  # insert não retorna resultado
+        ]
 
         service = DisciplinaService(mock_db)
 
         with pytest.raises(Exception, match="Erro ao criar disciplina"):
             service.criar(nome="Matemática", ano=2024, semestre=1)
+
+    def test_buscar_por_nome_ano_semestre_encontrado(self):
+        """Testa busca por nome, ano e semestre que encontra disciplina"""
+        mock_db = Mock()
+        mock_db.execute_query.return_value = [(1, "Matemática", 2024, 1)]
+
+        service = DisciplinaService(mock_db)
+        disciplina = service.buscar_por_nome_ano_semestre("Matemática", 2024, 1)
+
+        assert disciplina is not None
+        assert disciplina.id == 1
+        assert disciplina.nome == "Matemática"
+        assert disciplina.ano == 2024
+        assert disciplina.semestre == 1
+        mock_db.execute_query.assert_called_once_with(
+            (
+                "SELECT id, nome, ano, semestre FROM disciplina "
+                "WHERE nome = %s AND ano = %s AND semestre = %s"
+            ),
+            ("Matemática", 2024, 1),
+        )
+
+    def test_buscar_por_nome_ano_semestre_nao_encontrado(self):
+        """Testa busca por nome, ano e semestre que não encontra disciplina"""
+        mock_db = Mock()
+        mock_db.execute_query.return_value = []
+
+        service = DisciplinaService(mock_db)
+        disciplina = service.buscar_por_nome_ano_semestre("Física", 2024, 2)
+
+        assert disciplina is None
+        mock_db.execute_query.assert_called_once_with(
+            (
+                "SELECT id, nome, ano, semestre FROM disciplina "
+                "WHERE nome = %s AND ano = %s AND semestre = %s"
+            ),
+            ("Física", 2024, 2),
+        )
 
     def test_buscar_por_id_encontrado(self):
         """Testa busca por ID que encontra disciplina"""

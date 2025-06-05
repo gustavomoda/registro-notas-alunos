@@ -40,9 +40,16 @@ class DisciplinaService:
         """
         disciplina = Disciplina(id=None, nome=nome, ano=ano, semestre=semestre)
 
+        # Verifica se disciplina já existe
+        if self.buscar_por_nome_ano_semestre(
+            disciplina.nome, disciplina.ano, disciplina.semestre
+        ):
+            raise Exception("Disciplina já existe")
+
         try:
             query = (
-                "INSERT INTO disciplina (nome, ano, semestre) VALUES (%s, %s, %s) " "RETURNING id"
+                "INSERT INTO disciplina (nome, ano, semestre) VALUES (%s, %s, %s) "
+                "RETURNING id"
             )
             result = self.db.execute_query(
                 query, (disciplina.nome, disciplina.ano, disciplina.semestre)
@@ -80,6 +87,32 @@ class DisciplinaService:
         row = result[0]
         return Disciplina(id=row[0], nome=row[1], ano=row[2], semestre=row[3])
 
+    def buscar_por_nome_ano_semestre(
+        self, nome: str, ano: int, semestre: int
+    ) -> Optional[Disciplina]:
+        """
+        Busca uma disciplina pelo nome, ano e semestre
+
+        Args:
+            nome: Nome da disciplina
+            ano: Ano da disciplina
+            semestre: Semestre da disciplina
+
+        Returns:
+            Disciplina encontrada ou None se não encontrada
+        """
+        query = (
+            "SELECT id, nome, ano, semestre FROM disciplina "
+            "WHERE nome = %s AND ano = %s AND semestre = %s"
+        )
+        result = self.db.execute_query(query, (nome, ano, semestre))
+
+        if not result:
+            return None
+
+        row = result[0]
+        return Disciplina(id=row[0], nome=row[1], ano=row[2], semestre=row[3])
+
     def listar_todas(self) -> List[Disciplina]:
         """
         Lista todas as disciplinas cadastradas
@@ -90,7 +123,10 @@ class DisciplinaService:
         query = "SELECT id, nome, ano, semestre FROM disciplina ORDER BY nome"
         results = self.db.execute_query(query)
 
-        return [Disciplina(id=row[0], nome=row[1], ano=row[2], semestre=row[3]) for row in results]
+        return [
+            Disciplina(id=row[0], nome=row[1], ano=row[2], semestre=row[3])
+            for row in (results or [])
+        ]
 
     def listar_por_periodo(self, ano: int, semestre: int) -> List[Disciplina]:
         """
@@ -106,10 +142,16 @@ class DisciplinaService:
         if semestre not in [1, 2]:
             raise ValueError("Semestre deve ser 1 ou 2")
 
-        query = "SELECT id, nome, ano, semestre FROM disciplina WHERE ano = %s AND semestre = %s ORDER BY nome"
+        query = (
+            "SELECT id, nome, ano, semestre FROM disciplina "
+            "WHERE ano = %s AND semestre = %s ORDER BY nome"
+        )
         results = self.db.execute_query(query, (ano, semestre))
 
-        return [Disciplina(id=row[0], nome=row[1], ano=row[2], semestre=row[3]) for row in results]
+        return [
+            Disciplina(id=row[0], nome=row[1], ano=row[2], semestre=row[3])
+            for row in (results or [])
+        ]
 
     def atualizar(self, id: int, nome: str, ano: int, semestre: int) -> None:
         """
@@ -134,7 +176,10 @@ class DisciplinaService:
 
         try:
             disciplina = Disciplina(id=id, nome=nome, ano=ano, semestre=semestre)
-            query = "UPDATE disciplina SET nome = %s, ano = %s, semestre = %s " "WHERE id = %s"
+            query = (
+                "UPDATE disciplina SET nome = %s, ano = %s, semestre = %s "
+                "WHERE id = %s"
+            )
             self.db.execute_query(
                 query,
                 (disciplina.nome, disciplina.ano, disciplina.semestre, disciplina.id),
