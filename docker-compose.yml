@@ -15,7 +15,8 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - estacio_registro_notas_alunos:/var/lib/postgresql/data
-      - ./registro_notas_alunos/sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./registro_notas_alunos/sql/create_tables.sql:/docker-entrypoint-initdb.d/01-create_tables.sql
+      - ./registro_notas_alunos/sql/dados.sql:/docker-entrypoint-initdb.d/02-dados.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
       interval: 30s
