@@ -56,7 +56,7 @@ class GerenciarNotasScreen:
         form_frame = ttk.LabelFrame(main_frame, text="Dados das Notas", padding="10")
         form_frame.grid(row=1, column=0, columnspan=4, sticky="ew", pady=(0, 15))
 
-        # Linha 1 - Seleção de Aluno, Semestre e Matéria
+        # Linha 1 - Seleção de Aluno, Semestre e Disciplina
         ttk.Label(form_frame, text="Aluno:").grid(row=0, column=0, sticky=tk.W, pady=5)
         self.aluno_combo = ttk.Combobox(form_frame, width=25, state="readonly")
         self.aluno_combo.grid(row=0, column=1, pady=5, padx=(10, 20))
@@ -67,10 +67,10 @@ class GerenciarNotasScreen:
         self.semestre_combo.grid(row=0, column=3, pady=5, padx=(10, 20))
         self.semestre_combo.bind("<<ComboboxSelected>>", self.on_semestre_selected)
 
-        ttk.Label(form_frame, text="Matéria:").grid(row=0, column=4, sticky=tk.W, pady=5)
-        self.materia_combo = ttk.Combobox(form_frame, width=25, state="disabled")
-        self.materia_combo.grid(row=0, column=5, pady=5, padx=(10, 0))
-        self.materia_combo.bind("<<ComboboxSelected>>", self.on_materia_selected)
+        ttk.Label(form_frame, text="Disciplina:").grid(row=0, column=4, sticky=tk.W, pady=5)
+        self.disciplina_combo = ttk.Combobox(form_frame, width=25, state="disabled")
+        self.disciplina_combo.grid(row=0, column=5, pady=5, padx=(10, 0))
+        self.disciplina_combo.bind("<<ComboboxSelected>>", self.on_disciplina_selected)
 
         # Notas - Linha 2
         ttk.Label(form_frame, text="SM1:").grid(row=1, column=0, sticky=tk.W, pady=5)
@@ -217,6 +217,17 @@ class GerenciarNotasScreen:
             if not id_aluno:
                 return
 
+            # Limpar campos dependentes primeiro
+            self.semestre_combo.set("")
+            self.semestre_combo["state"] = "disabled"
+            self.disciplina_combo.set("")
+            self.disciplina_combo["state"] = "disabled"
+            self.disable_note_fields()
+
+            # Limpar matrícula atual se existir
+            if hasattr(self, "current_id_matricula"):
+                delattr(self, "current_id_matricula")
+
             # Buscar semestres onde o aluno tem matrícula
             matriculas_aluno = self.matricula_service.listar_por_aluno(id_aluno)
 
@@ -234,25 +245,33 @@ class GerenciarNotasScreen:
                 self.semestres_matriculas[semestre_key].append(matricula)
 
             # Habilitar e carregar combo de semestre
-            semestres_list = sorted(list(semestres))
-            self.semestre_combo["values"] = semestres_list
-            self.semestre_combo["state"] = "readonly"
+            if semestres:
+                semestres_list = sorted(list(semestres))
+                self.semestre_combo["values"] = semestres_list
+                self.semestre_combo["state"] = "readonly"
 
-            # Limpar combos dependentes
-            self.materia_combo.set("")
-            self.materia_combo["state"] = "disabled"
-            self.disable_note_fields()
+            # Atualizar estado dos botões
+            self.update_button_states()
 
         except Exception as e:
             logger.error(f"Erro ao carregar semestres: {e}")
             messagebox.showerror("Erro", f"Erro ao carregar semestres:\n{str(e)}")
 
     def on_semestre_selected(self, event):
-        """Carrega matérias disponíveis para o semestre selecionado"""
+        """Carrega disciplinas disponíveis para o semestre selecionado"""
         try:
             semestre_sel = self.semestre_combo.get()
             if not semestre_sel:
                 return
+
+            # Limpar campos dependentes primeiro
+            self.disciplina_combo.set("")
+            self.disciplina_combo["state"] = "disabled"
+            self.disable_note_fields()
+
+            # Limpar matrícula atual se existir
+            if hasattr(self, "current_id_matricula"):
+                delattr(self, "current_id_matricula")
 
             # Buscar matrículas do semestre selecionado
             matriculas_semestre = self.semestres_matriculas.get(semestre_sel, [])
@@ -266,27 +285,27 @@ class GerenciarNotasScreen:
                 self.disciplinas_dict[nome_disciplina] = id_matricula
                 disciplinas_nomes.append(nome_disciplina)
 
-            # Habilitar e carregar combo de matéria
-            self.materia_combo["values"] = sorted(disciplinas_nomes)
-            self.materia_combo["state"] = "readonly"
+            # Habilitar e carregar combo de disciplina
+            if disciplinas_nomes:
+                self.disciplina_combo["values"] = sorted(disciplinas_nomes)
+                self.disciplina_combo["state"] = "readonly"
 
-            # Limpar seleção de matéria
-            self.materia_combo.set("")
-            self.disable_note_fields()
+            # Atualizar estado dos botões
+            self.update_button_states()
 
         except Exception as e:
-            logger.error(f"Erro ao carregar matérias: {e}")
-            messagebox.showerror("Erro", f"Erro ao carregar matérias:\n{str(e)}")
+            logger.error(f"Erro ao carregar disciplinas: {e}")
+            messagebox.showerror("Erro", f"Erro ao carregar disciplinas:\n{str(e)}")
 
-    def on_materia_selected(self, event):
+    def on_disciplina_selected(self, event):
         """Habilita campos de notas e carrega dados existentes se houver"""
         try:
-            materia_sel = self.materia_combo.get()
-            if not materia_sel:
+            disciplina_sel = self.disciplina_combo.get()
+            if not disciplina_sel:
                 return
 
             # Obter ID da matrícula
-            self.current_id_matricula = self.disciplinas_dict[materia_sel]
+            self.current_id_matricula = self.disciplinas_dict[disciplina_sel]
 
             # Habilitar campos de notas
             self.enable_note_fields()
@@ -321,8 +340,8 @@ class GerenciarNotasScreen:
             self.update_button_states()
 
         except Exception as e:
-            logger.error(f"Erro ao carregar dados da matéria: {e}")
-            messagebox.showerror("Erro", f"Erro ao carregar dados da matéria:\n{str(e)}")
+            logger.error(f"Erro ao carregar dados da disciplina: {e}")
+            messagebox.showerror("Erro", f"Erro ao carregar dados da disciplina:\n{str(e)}")
 
     def enable_note_fields(self):
         """Habilita campos de entrada de notas"""
@@ -495,13 +514,13 @@ class GerenciarNotasScreen:
 
             # Selecionar semestre
             self.semestre_combo.set(ano_semestre)
-            self.on_semestre_selected(None)  # Carregar matérias
+            self.on_semestre_selected(None)  # Carregar disciplinas
 
-            # Selecionar matéria
-            self.materia_combo.set(nome_disciplina)
-            self.on_materia_selected(None)  # Carregar notas
+            # Selecionar disciplina
+            self.disciplina_combo.set(nome_disciplina)
+            self.on_disciplina_selected(None)  # Carregar notas
 
-            # O ID da nota já foi definido no on_materia_selected
+            # O ID da nota já foi definido no on_disciplina_selected
             self.selected_nota = values[0]  # id_nota
 
             # Atualizar estado dos botões
@@ -510,7 +529,7 @@ class GerenciarNotasScreen:
     def incluir_nota(self):
         """Inclui nova nota"""
         if not hasattr(self, "current_id_matricula") or not self.current_id_matricula:
-            messagebox.showerror("Erro", "Selecione aluno, semestre e matéria!")
+            messagebox.showerror("Erro", "Selecione aluno, semestre e disciplina!")
             return
 
         try:
@@ -614,8 +633,8 @@ class GerenciarNotasScreen:
         self.aluno_combo.set("")
         self.semestre_combo.set("")
         self.semestre_combo["state"] = "disabled"
-        self.materia_combo.set("")
-        self.materia_combo["state"] = "disabled"
+        self.disciplina_combo.set("")
+        self.disciplina_combo["state"] = "disabled"
         self.disable_note_fields()
         self.selected_nota = None
         if hasattr(self, "current_id_matricula"):
