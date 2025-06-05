@@ -659,16 +659,18 @@ class GerenciarNotasScreen:
         # Substitui vírgula por ponto para conversão
         return float(value_str.replace(",", "."))
 
-    def format_decimal_display(self, value: float) -> str:
+    def format_decimal_display(self, value) -> str:
         """
         Formata número para exibição brasileira (com vírgula)
 
         Args:
-            value: Valor numérico
+            value: Valor numérico (pode ser None)
 
         Returns:
-            str: Valor formatado com vírgula
+            str: Valor formatado com vírgula ou string vazia se None
         """
+        if value is None:
+            return ""
         return f"{value:.2f}".replace(".", ",")
 
     def update_button_states(self):
