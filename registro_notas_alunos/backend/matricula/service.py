@@ -8,6 +8,12 @@ from ..lib.database import DatabaseConnection
 from .model import Matricula
 
 
+class MatriculaJaExisteException(Exception):
+    """Exception específica para matrícula já existente"""
+
+    pass
+
+
 class MatriculaService:
     """
     Serviço responsável pelas operações de negócio relacionadas a Matrícula
@@ -34,14 +40,15 @@ class MatriculaService:
 
         Raises:
             ValueError: Se dados inválidos
-            Exception: Se matrícula já existe ou erro na criação
+            MatriculaJaExisteException: Se matrícula já existe
+            Exception: Se erro na criação
         """
         if matricula.id is not None:
             raise ValueError("Matrícula para criação não deve ter ID")
 
         # Verifica se matrícula já existe
         if self.buscar_por_aluno_disciplina(matricula.id_aluno, matricula.id_disciplina):
-            raise Exception("Matrícula já existe")
+            raise MatriculaJaExisteException("O aluno já está matriculado nesta disciplina")
 
         try:
             query = (
@@ -56,7 +63,7 @@ class MatriculaService:
         except Exception as e:
             # Captura erros de constraint do banco
             if "duplicate key" in str(e) or "unique constraint" in str(e):
-                raise Exception("Matrícula já existe")
+                raise MatriculaJaExisteException("Matrícula já existe")
             raise e
 
     def buscar_por_id(self, id: int) -> Optional[Matricula]:
@@ -97,7 +104,10 @@ class MatriculaService:
         if id_disciplina <= 0:
             raise ValueError("ID da disciplina deve ser maior que zero")
 
-        query = "SELECT id, id_aluno, id_disciplina FROM matricula WHERE id_aluno = %s AND id_disciplina = %s"
+        query = (
+            "SELECT id, id_aluno, id_disciplina FROM matricula "
+            "WHERE id_aluno = %s AND id_disciplina = %s"
+        )
         result = self.db.execute_query(query, (id_aluno, id_disciplina))
 
         if not result:
@@ -126,7 +136,7 @@ class MatriculaService:
             WHERE m.id_disciplina = %s
             ORDER BY a.nome
         """
-        return self.db.execute_query(query, (id_disciplina,))
+        return self.db.execute_query(query, (id_disciplina,)) or []
 
     def listar_por_aluno(self, id_aluno: int) -> List[Tuple[int, str, int, int]]:
         """
@@ -148,7 +158,7 @@ class MatriculaService:
             WHERE m.id_aluno = %s
             ORDER BY d.ano, d.semestre, d.nome
         """
-        return self.db.execute_query(query, (id_aluno,))
+        return self.db.execute_query(query, (id_aluno,)) or []
 
     def listar_todas(self) -> List[Tuple[int, str, str, str]]:
         """
@@ -164,7 +174,7 @@ class MatriculaService:
             JOIN disciplina d ON m.id_disciplina = d.id
             ORDER BY d.nome, a.nome
         """
-        return self.db.execute_query(query)
+        return self.db.execute_query(query) or []
 
     def excluir(self, id: int) -> None:
         """
@@ -195,4 +205,14 @@ class MatriculaService:
         if not matricula:
             raise Exception("Matrícula não encontrada")
 
+        assert matricula.id is not None
         self.excluir(matricula.id)
+
+    def deletar(self, id: int) -> None:
+        """
+        Deleta uma matrícula do sistema (alias para excluir)
+
+        Args:
+            id: ID da matrícula a ser deletada
+        """
+        self.excluir(id)

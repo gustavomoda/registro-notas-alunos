@@ -4,8 +4,10 @@ Serviço para operações com Notas
 
 from typing import List, Optional, Tuple
 
+from ..disciplina.model import Disciplina
 from ..lib.database import DatabaseConnection
 from .model import Notas
+from .vo import AlunoNotaApuradoVO
 
 
 class NotasService:
@@ -217,7 +219,8 @@ class NotasService:
             WHERE m.id_disciplina = %s
             ORDER BY a.nome
         """
-        return self.db.execute_query(query, (id_disciplina,))
+        result = self.db.execute_query(query, (id_disciplina,))
+        return result or []
 
     def listar_por_aluno(
         self, id_aluno: int
@@ -242,7 +245,8 @@ class NotasService:
             WHERE m.id_aluno = %s
             ORDER BY d.ano, d.semestre, d.nome
         """
-        return self.db.execute_query(query, (id_aluno,))
+        result = self.db.execute_query(query, (id_aluno,))
+        return result or []
 
     def calcular_todas_notas_finais(self) -> int:
         """
@@ -253,7 +257,7 @@ class NotasService:
         """
         # Busca todos os registros de notas
         query = "SELECT * FROM notas"
-        results = self.db.execute_query(query)
+        results = self.db.execute_query(query) or []
 
         contador = 0
         for row in results:
@@ -306,4 +310,161 @@ class NotasService:
         if not notas:
             raise Exception("Notas não encontradas")
 
+        # Como notas não é None e tem id, podemos fazer assert
+        assert notas.id is not None
         self.excluir(notas.id)
+
+    def calcular_nota_final_e_situacao(
+        self,
+        sm1: Optional[float],
+        sm2: Optional[float],
+        av: Optional[float],
+        avs: Optional[float],
+    ) -> tuple[float, str]:
+        """
+        Calcula a nota final e situação do aluno
+
+        Regras:
+        - SM1 vale até 1 ponto adicional na NF
+        - SM2 vale até 1 ponto adicional na NF
+        - AV vale até 10 pontos
+        - AVS vale até 10 pontos e substitui a AV se for maior
+        - Para aprovação: NF >= 6.0
+
+        Args:
+            sm1: Nota SM1 (pode ser None) - até 1 ponto
+            sm2: Nota SM2 (pode ser None) - até 1 ponto
+            av: Nota AV (pode ser None) - até 10 pontos
+            avs: Nota AVS (pode ser None) - até 10 pontos, substitui AV se maior
+
+        Returns:
+            tuple: (nota_final, situacao)
+        """
+        # Só calcula se tiver SM1, SM2 e AV preenchidos
+        if not all([sm1 is not None, sm2 is not None, av is not None]):
+            return 0.0, "PENDENTE"
+
+        # Como já validamos que sm1, sm2, av não são None, podemos fazer assert
+        assert sm1 is not None
+        assert sm2 is not None
+        assert av is not None
+
+        # Aplicar limites nas notas
+        sm1_val = min(sm1, 1.0)  # SM1 até 1 ponto
+        sm2_val = min(sm2, 1.0)  # SM2 até 1 ponto
+        av_val = min(av, 10.0)  # AV até 10 pontos
+
+        # AVS substitui AV se for maior
+        if avs is not None:
+            avs_val = min(avs, 10.0)  # AVS até 10 pontos
+            prova_val = max(av_val, avs_val)  # AVS substitui AV se maior
+        else:
+            prova_val = av_val
+
+        # Fórmula: NF = SM1 + SM2 + max(AV, AVS)
+        nf = sm1_val + sm2_val + prova_val
+        situacao = "APROVADO" if nf >= 6.0 else "REPROVADO"
+
+        return nf, situacao
+
+    def listar_notas_apuradas(self) -> List[AlunoNotaApuradoVO]:
+        """
+        Lista todas as notas apuradas com detalhes completos
+
+        Returns:
+            Lista de AlunoNotaApuradoVO com todas as informações
+        """
+        query = """
+            SELECT
+                n.id,
+                a.nome as nome_aluno,
+                d.id as disciplina_id,
+                d.nome as disciplina_nome,
+                d.ano as disciplina_ano,
+                d.semestre as disciplina_semestre,
+                n.sm1,
+                n.sm2,
+                n.av,
+                n.avs
+            FROM notas n
+            JOIN matricula m ON n.id_matricula = m.id
+            JOIN aluno a ON m.id_aluno = a.id
+            JOIN disciplina d ON m.id_disciplina = d.id
+            ORDER BY a.nome, d.nome
+        """
+        results = self.db.execute_query(query) or []
+
+        notas_apuradas = []
+        for row in results:
+            (
+                id_nota,
+                nome_aluno,
+                disciplina_id,
+                disciplina_nome,
+                disciplina_ano,
+                disciplina_semestre,
+                sm1,
+                sm2,
+                av,
+                avs,
+            ) = row
+
+            # Criar objeto Disciplina
+            disciplina = Disciplina(
+                id=disciplina_id,
+                nome=disciplina_nome,
+                ano=disciplina_ano,
+                semestre=disciplina_semestre,
+            )
+
+            # Calcular nota final usando as regras do service
+            nota_final, situacao = self.calcular_nota_final_e_situacao(
+                sm1, sm2, av, avs
+            )
+
+            # Criar VO
+            nota_apurada = AlunoNotaApuradoVO(
+                id_nota=id_nota,
+                nome_aluno=nome_aluno,
+                disciplina=disciplina,
+                sm1=sm1,
+                sm2=sm2,
+                av=av,
+                avs=avs,
+                nota_final=nota_final,
+                situacao=situacao,
+            )
+
+            notas_apuradas.append(nota_apurada)
+
+        return notas_apuradas
+
+    def listar_com_detalhes(self) -> List[AlunoNotaApuradoVO]:
+        """
+        Alias para listar_notas_apuradas para manter compatibilidade
+
+        Returns:
+            Lista de AlunoNotaApuradoVO
+        """
+        return self.listar_notas_apuradas()
+
+    def calcular_nota_final(
+        self,
+        sm1: Optional[float],
+        sm2: Optional[float],
+        av: Optional[float],
+        avs: Optional[float],
+    ) -> tuple[float, str]:
+        """
+        Alias para calcular_nota_final_e_situacao para manter compatibilidade
+        """
+        return self.calcular_nota_final_e_situacao(sm1, sm2, av, avs)
+
+    def deletar(self, id: int) -> None:
+        """
+        Alias para excluir
+
+        Args:
+            id: ID do registro a ser deletado
+        """
+        self.excluir(id)

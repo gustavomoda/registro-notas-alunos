@@ -186,7 +186,14 @@ class GerenciarDisciplinasScreen:
 
         except Exception as e:
             logger.error(f"Erro ao incluir disciplina: {e}")
-            messagebox.showerror("Erro", f"Erro ao incluir:\n{str(e)}")
+            error_msg = str(e)
+
+            if "já existe" in error_msg:
+                messagebox.showerror("Erro", "Esta disciplina já existe!")
+            else:
+                messagebox.showerror(
+                    "Erro", "Erro ao salvar, entre em contato com o Suporte"
+                )
 
     def alterar_disciplina(self):
         """Altera disciplina selecionada"""
@@ -220,7 +227,16 @@ class GerenciarDisciplinasScreen:
 
         except Exception as e:
             logger.error(f"Erro ao alterar disciplina: {e}")
-            messagebox.showerror("Erro", f"Erro ao alterar:\n{str(e)}")
+            error_msg = str(e)
+
+            if "já existe" in error_msg:
+                messagebox.showerror("Erro", "Esta disciplina já existe!")
+            elif "não encontrada" in error_msg:
+                messagebox.showerror("Erro", "Disciplina não encontrada!")
+            else:
+                messagebox.showerror(
+                    "Erro", "Erro ao salvar, entre em contato com o Suporte"
+                )
 
     def excluir_disciplina(self):
         """Exclui disciplina"""
@@ -242,7 +258,9 @@ class GerenciarDisciplinasScreen:
 
             except Exception as e:
                 logger.error(f"Erro ao excluir disciplina: {e}")
-                messagebox.showerror("Erro", f"Erro ao excluir:\n{str(e)}")
+                messagebox.showerror(
+                    "Erro", "Erro ao salvar, entre em contato com o Suporte"
+                )
 
     def limpar_campos(self):
         """Limpa campos"""
