@@ -21,9 +21,13 @@ from .notas import Notas, NotasService
 from .lib.database import DatabaseConnection
 
 __all__ = [
-    'Aluno', 'AlunoService',
-    'Disciplina', 'DisciplinaService', 
-    'Matricula', 'MatriculaService',
-    'Notas', 'NotasService',
-    'DatabaseConnection'
+    "Aluno",
+    "AlunoService",
+    "Disciplina",
+    "DisciplinaService",
+    "Matricula",
+    "MatriculaService",
+    "Notas",
+    "NotasService",
+    "DatabaseConnection",
 ]

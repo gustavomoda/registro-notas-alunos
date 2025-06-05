@@ -15,7 +15,26 @@ pytest = "^7.4.0"
 black = "^23.7.0"
 flake8 = "^6.1.0"
 
+[tool.black]
+line-length = 100
+target-version = ['py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # Directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
 [build-system]
 requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api" 
- 
+build-backend = "poetry.core.masonry.api"

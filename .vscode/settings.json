@@ -1,0 +1,143 @@
+{
+    // === CONFIGURAÇÕES PYTHON ===
+    "python.defaultInterpreterPath": "./.venv/bin/python",
+    "python.terminal.activateEnvironment": true,
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Args": [
+        "--max-line-length=100"
+    ],
+    "python.linting.mypyEnabled": true,
+    "python.linting.banditEnabled": true,
+    "python.linting.lintOnSave": true,
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length=100"
+    ],
+    "python.sortImports.args": [
+        "--profile",
+        "black"
+    ],
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoSearchPaths": true,
+    "python.analysis.extraPaths": [
+        "./registro_notas_alunos"
+    ],
+    // === FORMATAÇÃO AUTOMÁTICA ===
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.formatOnType": false,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit",
+        "source.fixAll": "explicit"
+    },
+    // === CONFIGURAÇÕES GERAIS ===
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "editor.trimAutoWhitespace": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    // === FILTROS DE ARQUIVOS ===
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/*.pyo": true,
+        "**/*.pyd": true,
+        "**/.Python": true,
+        "**/build": true,
+        "**/develop-eggs": true,
+        "**/dist": true,
+        "**/downloads": true,
+        "**/eggs": true,
+        "**/.eggs": true,
+        "**/lib": true,
+        "**/lib64": true,
+        "**/parts": true,
+        "**/sdist": true,
+        "**/var": true,
+        "**/wheels": true,
+        "**/*.egg-info": true,
+        "**/.installed.cfg": true,
+        "**/*.egg": true,
+        "**/.pytest_cache": true,
+        "**/.coverage": true,
+        "**/htmlcov": true,
+        "**/.mypy_cache": true,
+        "**/.dmypy.json": true,
+        "**/.vscode/.ropeproject": true
+    },
+    "search.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/node_modules": true,
+        "**/.venv": true,
+        "**/venv": true,
+        "**/env": true,
+        "**/.git": true,
+        "**/.pytest_cache": true,
+        "**/.mypy_cache": true
+    },
+    "files.watcherExclude": {
+        "**/__pycache__/**": true,
+        "**/.venv/**": true,
+        "**/venv/**": true,
+        "**/env/**": true,
+        "**/.git/**": true,
+        "**/node_modules/**": true
+    },
+    // === TESTING ===
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestArgs": [
+        "teste",
+        "-v",
+        "--tb=short"
+    ],
+    "python.testing.autoTestDiscoverOnSaveEnabled": true,
+    // === DOCSTRING ===
+    "autoDocstring.docstringFormat": "google",
+    "autoDocstring.startOnNewLine": false,
+    "autoDocstring.includeExtendedSummary": true,
+    // === EXPLORER ===
+    "explorer.compactFolders": false,
+    "explorer.confirmDelete": true,
+    "explorer.confirmDragAndDrop": true,
+    // === TERMINAL ===
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "terminal.integrated.cwd": "${workspaceFolder}",
+    // === INTELLISENSE ===
+    "editor.suggestSelection": "first",
+    "editor.acceptSuggestionOnCommitCharacter": false,
+    "editor.acceptSuggestionOnEnter": "on",
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": false,
+        "strings": false
+    },
+    // === BRACKET PAIR COLORIZATION ===
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": "active",
+    // === MINIMAP ===
+    "editor.minimap.enabled": true,
+    "editor.minimap.maxColumn": 100,
+    // === RULERS ===
+    "editor.rulers": [
+        100
+    ],
+    // === ESPECÍFICO PARA ESTE PROJETO ===
+    "python.analysis.include": [
+        "registro_notas_alunos",
+        "teste"
+    ],
+    "python.envFile": "${workspaceFolder}/.env",
+    // === EMMET ===
+    "emmet.includeLanguages": {
+        "python": "python"
+    }
+}

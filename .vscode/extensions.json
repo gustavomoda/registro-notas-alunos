@@ -1,0 +1,36 @@
+{
+    "recommendations": [
+        // === PYTHON ESSENCIAL ===
+        "ms-python.python", // Python Language Support
+        "ms-python.vscode-pylance", // Python Language Server
+        "ms-python.black-formatter", // Black Python Formatter
+        "ms-python.isort", // Import Sorter
+        "ms-python.flake8", // Linter
+        "ms-python.mypy-type-checker", // Type Checker
+        // === TESTING ===
+        "ms-python.debugpy", // Python Debugger
+        // === DOCKER ===
+        "ms-azuretools.vscode-docker", // Docker Support
+        // === GIT ===
+        "eamodio.gitlens", // Git Supercharged
+        "github.vscode-pull-request-github", // GitHub Pull Requests
+        "donjayamanne.githistory", // Git History Viewer
+        // === PRODUTIVIDADE ===
+        "ms-vscode.vscode-todo-highlight", // TODO Highlighter
+        "gruntfuggly.todo-tree", // TODO Tree View
+        "streetsidesoftware.code-spell-checker", // Spell Checker
+        "streetsidesoftware.code-spell-checker-portuguese-brazil", // PT-BR Dictionary
+        // === VISUAL ===
+        "pkief.material-icon-theme", // Material Icons
+        "zhuangtongfa.material-theme", // One Dark Pro Theme
+        "oderwat.indent-rainbow", // Indent Colors
+        "mechatroner.rainbow-csv", // CSV Viewer
+        // === FERRAMENTAS ===
+        "ms-vscode.vscode-json", // JSON Tools
+        "redhat.vscode-yaml" // YAML Support
+    ],
+    "unwantedRecommendations": [
+        "ms-python.pylint", // Pylint (usando Flake8)
+        "formulahendry.code-runner" // Code Runner (desnecessário)
+    ]
+}
