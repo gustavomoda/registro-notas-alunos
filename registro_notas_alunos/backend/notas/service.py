@@ -10,6 +10,12 @@ from .model import Notas
 from .vo import AlunoNotaApuradoVO
 
 
+class NotasJaExistemException(Exception):
+    """Exception específica para notas já existentes"""
+
+    pass
+
+
 class NotasService:
     """
     Serviço responsável pelas operações de negócio relacionadas a Notas
@@ -36,14 +42,15 @@ class NotasService:
 
         Raises:
             ValueError: Se dados inválidos
-            Exception: Se notas já existem ou erro na criação
+            NotasJaExistemException: Se notas já existem
+            Exception: Se erro na criação
         """
         if notas.id is not None:
             raise ValueError("Notas para criação não devem ter ID")
 
         # Verifica se já existem notas para esta matrícula
         if self.buscar_por_matricula(notas.id_matricula):
-            raise Exception("Notas já existem")
+            raise NotasJaExistemException("Notas já existem para esta matrícula")
 
         try:
             # Calcula nota final antes de salvar
@@ -72,7 +79,7 @@ class NotasService:
         except Exception as e:
             # Captura erros de constraint do banco
             if "duplicate key" in str(e) or "unique constraint" in str(e):
-                raise Exception("Notas já existem")
+                raise NotasJaExistemException("Notas já existem")
             raise e
 
     def buscar_por_id(self, id: int) -> Optional[Notas]:
@@ -418,9 +425,7 @@ class NotasService:
             )
 
             # Calcular nota final usando as regras do service
-            nota_final, situacao = self.calcular_nota_final_e_situacao(
-                sm1, sm2, av, avs
-            )
+            nota_final, situacao = self.calcular_nota_final_e_situacao(sm1, sm2, av, avs)
 
             # Criar VO
             nota_apurada = AlunoNotaApuradoVO(
