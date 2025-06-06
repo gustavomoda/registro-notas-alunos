@@ -103,6 +103,13 @@ docker-compose ps
 registro-notas
 ```
 
+### Via Comando Run (Poetry)
+```bash
+poetry run run
+# ou se estiver no ambiente virtual ativo:
+run
+```
+
 ### Via Módulo Python
 ```bash
 python -m registro_notas_alunos

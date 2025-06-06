@@ -8,6 +8,7 @@ packages = [{include = "registro_notas_alunos"}]
 
 [tool.poetry.scripts]
 registro-notas = "registro_notas_alunos.__main__:main"
+run = "registro_notas_alunos.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"

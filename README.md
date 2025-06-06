@@ -188,7 +188,19 @@ docker-compose up -d
 
 ### Interface Gráfica (tkinter)
 ```bash
+# Via arquivo principal
 python app.py
+
+# Via Poetry (recomendado)
+poetry run run
+# ou se ambiente virtual ativo:
+run
+
+# Via módulo
+python -m registro_notas_alunos
+
+# Via script instalado
+registro-notas
 ```
 
 ### Desenvolvimento no VS Code
