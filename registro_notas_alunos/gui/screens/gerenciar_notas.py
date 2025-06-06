@@ -2,8 +2,7 @@ import logging
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from registro_notas_alunos.backend import (AlunoService, MatriculaService,
-                                           NotasService)
+from registro_notas_alunos.backend import AlunoService, MatriculaService, NotasService
 from registro_notas_alunos.backend.lib.database import DatabaseConnection
 from registro_notas_alunos.backend.notas.model import Notas
 from registro_notas_alunos.backend.notas.service import NotasJaExistemException
@@ -11,12 +10,42 @@ from registro_notas_alunos.backend.notas.service import NotasJaExistemException
 logger = logging.getLogger(__name__)
 
 
+# Exceções específicas para a GUI
+class ValidationError(Exception):
+    """Erro de validação de dados de entrada"""
+
+    pass
+
+
+class DataNotFoundError(Exception):
+    """Erro quando dados esperados não são encontrados"""
+
+    pass
+
+
+class SelectionError(Exception):
+    """Erro relacionado à seleção de itens na interface"""
+
+    pass
+
+
+class DatabaseConnectionError(Exception):
+    """Erro de conexão com banco de dados"""
+
+    pass
+
+
 class GerenciarNotasScreen:
     def __init__(self, parent):
         self.parent = parent
-        self.db = DatabaseConnection()
-        self.notas_service = NotasService(self.db)
-        self.matricula_service = MatriculaService(self.db)
+        try:
+            self.db = DatabaseConnection()
+            self.notas_service = NotasService(self.db)
+            self.matricula_service = MatriculaService(self.db)
+        except Exception as e:
+            logger.error(f"Erro ao conectar com banco de dados: {e}")
+            raise DatabaseConnectionError("Erro ao conectar com banco de dados")
+
         self.selected_nota = None
         self.create_window()
 
@@ -198,25 +227,34 @@ class GerenciarNotasScreen:
         """Carrega apenas os alunos no primeiro combo"""
         try:
             aluno_service = AlunoService(self.db)
-
             alunos = aluno_service.listar_todos()
+
+            if not alunos:
+                raise DataNotFoundError("Nenhum aluno cadastrado no sistema")
+
             self.alunos_dict = {aluno.nome: aluno.id for aluno in alunos}
             self.aluno_combo["values"] = list(self.alunos_dict.keys())
 
+        except DataNotFoundError as e:
+            logger.warning(f"Dados não encontrados: {e}")
+            messagebox.showwarning("Aviso", str(e))
+        except DatabaseConnectionError as e:
+            logger.error(f"Erro de conexão: {e}")
+            messagebox.showerror("Erro de Conexão", "Erro ao conectar com o banco de dados")
         except Exception as e:
-            logger.error(f"Erro ao carregar alunos: {e}")
-            messagebox.showerror("Erro", f"Erro ao carregar alunos:\n{str(e)}")
+            logger.exception(f"Erro inesperado ao carregar alunos: {e}")
+            messagebox.showerror("Erro", "Erro inesperado. Entre em contato com o Suporte")
 
     def on_aluno_selected(self, event):
         """Carrega semestres disponíveis para o aluno selecionado"""
         try:
             aluno_nome = self.aluno_combo.get()
             if not aluno_nome:
-                return
+                raise SelectionError("Nenhum aluno selecionado")
 
             id_aluno = self.alunos_dict.get(aluno_nome)
             if not id_aluno:
-                return
+                raise SelectionError("Aluno selecionado não encontrado")
 
             # Limpar campos dependentes primeiro
             self.semestre_combo.set("")
@@ -231,6 +269,9 @@ class GerenciarNotasScreen:
 
             # Buscar semestres onde o aluno tem matrícula
             matriculas_aluno = self.matricula_service.listar_por_aluno(id_aluno)
+
+            if not matriculas_aluno:
+                raise DataNotFoundError("Aluno não possui matrículas em disciplinas")
 
             # Extrair semestres únicos (ano/semestre)
             semestres = set()
@@ -254,16 +295,25 @@ class GerenciarNotasScreen:
             # Atualizar estado dos botões
             self.update_button_states()
 
+        except SelectionError as e:
+            logger.warning(f"Erro de seleção: {e}")
+            # Não mostrar mensagem para erros de seleção triviais
+        except DataNotFoundError as e:
+            logger.warning(f"Dados não encontrados: {e}")
+            messagebox.showwarning("Aviso", str(e))
+        except DatabaseConnectionError as e:
+            logger.error(f"Erro de conexão: {e}")
+            messagebox.showerror("Erro de Conexão", "Erro ao conectar com o banco de dados")
         except Exception as e:
-            logger.error(f"Erro ao carregar semestres: {e}")
-            messagebox.showerror("Erro", f"Erro ao carregar semestres:\n{str(e)}")
+            logger.exception(f"Erro inesperado ao carregar semestres: {e}")
+            messagebox.showerror("Erro", "Erro inesperado. Entre em contato com o Suporte")
 
     def on_semestre_selected(self, event):
         """Carrega disciplinas disponíveis para o semestre selecionado"""
         try:
             semestre_sel = self.semestre_combo.get()
             if not semestre_sel:
-                return
+                raise SelectionError("Nenhum semestre selecionado")
 
             # Limpar campos dependentes primeiro
             self.disciplina_combo.set("")
@@ -276,6 +326,9 @@ class GerenciarNotasScreen:
 
             # Buscar matrículas do semestre selecionado
             matriculas_semestre = self.semestres_matriculas.get(semestre_sel, [])
+
+            if not matriculas_semestre:
+                raise DataNotFoundError("Nenhuma disciplina encontrada para este semestre")
 
             # Extrair disciplinas
             self.disciplinas_dict = {}
@@ -294,19 +347,30 @@ class GerenciarNotasScreen:
             # Atualizar estado dos botões
             self.update_button_states()
 
+        except SelectionError as e:
+            logger.warning(f"Erro de seleção: {e}")
+            # Não mostrar mensagem para erros de seleção triviais
+        except DataNotFoundError as e:
+            logger.warning(f"Dados não encontrados: {e}")
+            messagebox.showwarning("Aviso", str(e))
+        except DatabaseConnectionError as e:
+            logger.error(f"Erro de conexão: {e}")
+            messagebox.showerror("Erro de Conexão", "Erro ao conectar com o banco de dados")
         except Exception as e:
-            logger.error(f"Erro ao carregar disciplinas: {e}")
-            messagebox.showerror("Erro", f"Erro ao carregar disciplinas:\n{str(e)}")
+            logger.exception(f"Erro inesperado ao carregar disciplinas: {e}")
+            messagebox.showerror("Erro", "Erro inesperado. Entre em contato com o Suporte")
 
     def on_disciplina_selected(self, event):
         """Habilita campos de notas e carrega dados existentes se houver"""
         try:
             disciplina_sel = self.disciplina_combo.get()
             if not disciplina_sel:
-                return
+                raise SelectionError("Nenhuma disciplina selecionada")
 
             # Obter ID da matrícula
-            self.current_id_matricula = self.disciplinas_dict[disciplina_sel]
+            self.current_id_matricula = self.disciplinas_dict.get(disciplina_sel)
+            if not self.current_id_matricula:
+                raise DataNotFoundError("Matrícula não encontrada para disciplina selecionada")
 
             # Habilitar campos de notas
             self.enable_note_fields()
@@ -340,9 +404,18 @@ class GerenciarNotasScreen:
             # Atualizar estado dos botões
             self.update_button_states()
 
+        except SelectionError as e:
+            logger.warning(f"Erro de seleção: {e}")
+            # Não mostrar mensagem para erros de seleção triviais
+        except DataNotFoundError as e:
+            logger.warning(f"Dados não encontrados: {e}")
+            messagebox.showwarning("Aviso", str(e))
+        except DatabaseConnectionError as e:
+            logger.error(f"Erro de conexão: {e}")
+            messagebox.showerror("Erro de Conexão", "Erro ao conectar com o banco de dados")
         except Exception as e:
-            logger.error(f"Erro ao carregar dados da disciplina: {e}")
-            messagebox.showerror("Erro", f"Erro ao carregar dados da disciplina:\n{str(e)}")
+            logger.exception(f"Erro inesperado ao carregar dados da disciplina: {e}")
+            messagebox.showerror("Erro", "Erro inesperado. Entre em contato com o Suporte")
 
     def enable_note_fields(self):
         """Habilita campos de entrada de notas"""
@@ -405,9 +478,12 @@ class GerenciarNotasScreen:
 
             logger.info(f"Tabela notas atualizada - {len(notas_apuradas)} registros")
 
+        except DatabaseConnectionError as e:
+            logger.error(f"Erro de conexão ao atualizar tabela: {e}")
+            messagebox.showerror("Erro de Conexão", "Erro ao conectar com o banco de dados")
         except Exception as e:
-            logger.error(f"Erro ao atualizar tabela notas: {e}")
-            messagebox.showerror("Erro", f"Erro ao carregar notas:\n{str(e)}")
+            logger.exception(f"Erro inesperado ao atualizar tabela notas: {e}")
+            messagebox.showerror("Erro", "Erro inesperado. Entre em contato com o Suporte")
 
     def validar_notas(self, sm1, sm2, av, avs, mostrar_mensagem=True):
         """
@@ -428,32 +504,41 @@ class GerenciarNotasScreen:
             if sm1 is not None and (sm1 < 0 or sm1 > 1):
                 if mostrar_mensagem:
                     valor_formatado = self.format_decimal_display(sm1)
-                    messagebox.showerror("Erro", f"SM1 = {valor_formatado} deve ser ≤ 1,00!")
+                    raise ValidationError(f"SM1 = {valor_formatado} deve ser ≤ 1,00!")
                 return False
 
             if sm2 is not None and (sm2 < 0 or sm2 > 1):
                 if mostrar_mensagem:
                     valor_formatado = self.format_decimal_display(sm2)
-                    messagebox.showerror("Erro", f"SM2 = {valor_formatado} deve ser ≤ 1,00!")
+                    raise ValidationError(f"SM2 = {valor_formatado} deve ser ≤ 1,00!")
                 return False
 
             if av is not None and (av < 0 or av > 10):
                 if mostrar_mensagem:
                     valor_formatado = self.format_decimal_display(av)
-                    messagebox.showerror("Erro", f"AV = {valor_formatado} deve ser ≤ 10,00!")
+                    raise ValidationError(f"AV = {valor_formatado} deve ser ≤ 10,00!")
                 return False
 
             if avs is not None and (avs < 0 or avs > 10):
                 if mostrar_mensagem:
                     valor_formatado = self.format_decimal_display(avs)
-                    messagebox.showerror("Erro", f"AVS = {valor_formatado} deve ser ≤ 10,00!")
+                    raise ValidationError(f"AVS = {valor_formatado} deve ser ≤ 10,00!")
                 return False
 
             return True
 
-        except Exception as e:
+        except ValidationError as e:
             if mostrar_mensagem:
-                messagebox.showerror("Erro", f"Valores inválidos digitados! {str(e)}")
+                messagebox.showerror("Erro de Validação", str(e))
+            return False
+        except (ValueError, TypeError) as e:
+            if mostrar_mensagem:
+                messagebox.showerror("Erro de Validação", "Valores inválidos digitados!")
+            return False
+        except Exception as e:
+            logger.exception(f"Erro inesperado na validação: {e}")
+            if mostrar_mensagem:
+                messagebox.showerror("Erro", "Erro inesperado na validação")
             return False
 
     def calcular_preview(self, event=None):
@@ -491,8 +576,12 @@ class GerenciarNotasScreen:
                 else:
                     self.situacao_label.config(text=situacao, foreground="red")
 
+        except (ValueError, TypeError) as e:
+            logger.warning(f"Erro de conversão no preview: {e}")
+            self.nf_label.config(text="--", foreground="gray")
+            self.situacao_label.config(text="--", foreground="gray")
         except Exception as e:
-            logger.error(f"Erro ao calcular preview: {e}")
+            logger.exception(f"Erro inesperado ao calcular preview: {e}")
             self.nf_label.config(text="--", foreground="gray")
             self.situacao_label.config(text="--", foreground="gray")
 
@@ -529,19 +618,23 @@ class GerenciarNotasScreen:
 
     def incluir_nota(self):
         """Inclui nova nota"""
-        if not hasattr(self, "current_id_matricula") or not self.current_id_matricula:
-            messagebox.showerror("Erro", "Selecione aluno, semestre e disciplina!")
-            return
-
         try:
+            # Validar se há seleção completa
+            if not hasattr(self, "current_id_matricula") or not self.current_id_matricula:
+                raise SelectionError("Selecione aluno, semestre e disciplina!")
+
             # Limpar seleção para garantir que é uma inclusão nova
             self.selected_nota = None
             self.tree.selection_remove(self.tree.selection())
 
-            sm1 = self.convert_decimal_input(self.sm1_entry.get() or "0")
-            sm2 = self.convert_decimal_input(self.sm2_entry.get() or "0")
-            av = self.convert_decimal_input(self.av_entry.get() or "0")
-            avs = self.convert_decimal_input(self.avs_entry.get() or "0")
+            # Converter e validar valores
+            try:
+                sm1 = self.convert_decimal_input(self.sm1_entry.get() or "0")
+                sm2 = self.convert_decimal_input(self.sm2_entry.get() or "0")
+                av = self.convert_decimal_input(self.av_entry.get() or "0")
+                avs = self.convert_decimal_input(self.avs_entry.get() or "0")
+            except (ValueError, TypeError):
+                raise ValidationError("Valores inválidos digitados!")
 
             # Validar notas antes de salvar
             if not self.validar_notas(sm1, sm2, av, avs):
@@ -558,25 +651,38 @@ class GerenciarNotasScreen:
             self.update_button_states()
 
             logger.info(f"Nota incluída para matrícula {self.current_id_matricula}")
+            messagebox.showinfo("Sucesso", "Nota incluída com sucesso!")
 
+        except SelectionError as e:
+            logger.warning(f"Erro de seleção: {e}")
+            messagebox.showerror("Erro de Seleção", str(e))
+        except ValidationError as e:
+            logger.warning(f"Erro de validação: {e}")
+            messagebox.showerror("Erro de Validação", str(e))
         except NotasJaExistemException as e:
-            logger.info(f"Tentativa de incluir nota duplicada: {e}")
+            logger.info(f"Tentativa de incluir nota existente: {e}")
             messagebox.showinfo("Informação", "Nota já existe para esta matrícula!")
+        except DatabaseConnectionError as e:
+            logger.error(f"Erro de conexão ao incluir nota: {e}")
+            messagebox.showerror("Erro de Conexão", "Erro ao conectar com o banco de dados")
         except Exception as e:
-            logger.error(f"Erro ao incluir nota: {e}")
-            messagebox.showerror("Erro", "Erro ao salvar, entre em contato com o Suporte")
+            logger.exception(f"Erro inesperado ao incluir nota: {e}")
+            messagebox.showerror("Erro", "Erro inesperado. Entre em contato com o Suporte")
 
     def alterar_nota(self):
         """Altera nota selecionada"""
-        if not self.selected_nota:
-            messagebox.showerror("Erro", "Selecione uma nota na tabela!")
-            return
-
         try:
-            sm1 = self.convert_decimal_input(self.sm1_entry.get() or "0")
-            sm2 = self.convert_decimal_input(self.sm2_entry.get() or "0")
-            av = self.convert_decimal_input(self.av_entry.get() or "0")
-            avs = self.convert_decimal_input(self.avs_entry.get() or "0")
+            if not self.selected_nota:
+                raise SelectionError("Selecione uma nota na tabela!")
+
+            # Converter e validar valores
+            try:
+                sm1 = self.convert_decimal_input(self.sm1_entry.get() or "0")
+                sm2 = self.convert_decimal_input(self.sm2_entry.get() or "0")
+                av = self.convert_decimal_input(self.av_entry.get() or "0")
+                avs = self.convert_decimal_input(self.avs_entry.get() or "0")
+            except (ValueError, TypeError):
+                raise ValidationError("Valores inválidos digitados!")
 
             # Validar notas antes de salvar
             if not self.validar_notas(sm1, sm2, av, avs):
@@ -598,36 +704,60 @@ class GerenciarNotasScreen:
             self.update_button_states()
 
             logger.info(f"Nota alterada ID {self.selected_nota}")
+            messagebox.showinfo("Sucesso", "Nota alterada com sucesso!")
 
+        except SelectionError as e:
+            logger.warning(f"Erro de seleção: {e}")
+            messagebox.showerror("Erro de Seleção", str(e))
+        except ValidationError as e:
+            logger.warning(f"Erro de validação: {e}")
+            messagebox.showerror("Erro de Validação", str(e))
+        except DataNotFoundError as e:
+            logger.warning(f"Nota não encontrada: {e}")
+            messagebox.showerror("Erro", "Nota não encontrada!")
+        except DatabaseConnectionError as e:
+            logger.error(f"Erro de conexão ao alterar nota: {e}")
+            messagebox.showerror("Erro de Conexão", "Erro ao conectar com o banco de dados")
         except Exception as e:
-            logger.error(f"Erro ao alterar nota: {e}")
             error_msg = str(e)
-
             if "não encontrada" in error_msg:
+                logger.warning(f"Nota não encontrada: {e}")
                 messagebox.showerror("Erro", "Nota não encontrada!")
             else:
-                messagebox.showerror("Erro", "Erro ao salvar, entre em contato com o Suporte")
+                logger.exception(f"Erro inesperado ao alterar nota: {e}")
+                messagebox.showerror("Erro", "Erro inesperado. Entre em contato com o Suporte")
 
     def excluir_nota(self):
         """Exclui nota selecionada"""
-        if not self.selected_nota:
-            messagebox.showerror("Erro", "Selecione uma nota na tabela!")
-            return
+        try:
+            if not self.selected_nota:
+                raise SelectionError("Selecione uma nota na tabela!")
 
-        if messagebox.askyesno("Confirmar", "Excluir nota selecionada?"):
-            try:
-                self.notas_service.deletar(int(self.selected_nota))
-                self.refresh_table()
-                self.limpar_campos()
+            if not messagebox.askyesno("Confirmar", "Excluir nota selecionada?"):
+                return
 
-                # Atualizar estado dos botões
-                self.update_button_states()
+            self.notas_service.deletar(int(self.selected_nota))
+            self.refresh_table()
+            self.limpar_campos()
 
-                logger.info(f"Nota excluída ID {self.selected_nota}")
+            # Atualizar estado dos botões
+            self.update_button_states()
 
-            except Exception as e:
-                logger.error(f"Erro ao excluir nota: {e}")
-                messagebox.showerror("Erro", "Erro ao salvar, entre em contato com o Suporte")
+            logger.info(f"Nota excluída ID {self.selected_nota}")
+            messagebox.showinfo("Sucesso", "Nota excluída com sucesso!")
+
+        except SelectionError as e:
+            logger.warning(f"Erro de seleção: {e}")
+            messagebox.showerror("Erro de Seleção", str(e))
+        except DataNotFoundError as e:
+            logger.warning(f"Nota não encontrada: {e}")
+            messagebox.showerror("Erro", "Nota não encontrada!")
+        except DatabaseConnectionError as e:
+            logger.error(f"Erro de conexão ao excluir nota: {e}")
+            messagebox.showerror("Erro de Conexão", "Erro ao conectar com o banco de dados")
+        except Exception as e:
+            logger.exception(f"Erro inesperado ao excluir nota: {e}")
+            messagebox.showerror("Erro", "Erro inesperado. Entre em contato com o Suporte")
 
     def limpar_campos(self):
         """Limpa todos os campos"""
@@ -654,11 +784,18 @@ class GerenciarNotasScreen:
 
         Returns:
             float: Valor convertido
+
+        Raises:
+            ValueError: Se valor não puder ser convertido
         """
         if not value_str.strip():
             return 0.0
-        # Substitui vírgula por ponto para conversão
-        return float(value_str.replace(",", "."))
+
+        try:
+            # Substitui vírgula por ponto para conversão
+            return float(value_str.replace(",", "."))
+        except ValueError:
+            raise ValueError(f"Valor '{value_str}' não é um número válido")
 
     def format_decimal_display(self, value) -> str:
         """
