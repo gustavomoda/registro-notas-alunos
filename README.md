@@ -192,9 +192,9 @@ docker-compose up -d
 python app.py
 
 # Via Poetry (recomendado)
-poetry run run
+poetry run start
 # ou se ambiente virtual ativo:
-run
+start
 
 # Via módulo
 python -m registro_notas_alunos

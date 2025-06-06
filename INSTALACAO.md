@@ -103,11 +103,11 @@ docker-compose ps
 registro-notas
 ```
 
-### Via Comando Run (Poetry)
+### Via Comando Start (Poetry)
 ```bash
-poetry run run
+poetry run start
 # ou se estiver no ambiente virtual ativo:
-run
+start
 ```
 
 ### Via Módulo Python

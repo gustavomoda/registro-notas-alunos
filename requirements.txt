@@ -1,7 +1,27 @@
-psycopg2-binary~=2.9.9
-python-dotenv~=1.0.0
+# ===========================================
+# REQUIREMENTS.TXT - Gerado via Poetry
+# Atualizado em: 2025-06-06 19:44:11
+# ===========================================
 
-# Dependências de desenvolvimento (opcional)
-pytest~=7.4.0
-black~=23.7.0
-flake8~=6.1.0
+# Dependências principais
+psycopg2-binary==2.9.10
+python-dotenv==1.0.1
+
+# Dependências de desenvolvimento
+black==23.12.1
+click==8.1.8
+flake8==6.1.0
+iniconfig==2.1.0
+mccabe==0.7.0
+mypy_extensions==1.1.0
+packaging==25.0
+pathspec==0.12.1
+platformdirs==4.3.6
+pluggy==1.5.0
+pycodestyle==2.11.1
+pyflakes==3.1.0
+pytest-cov==6.1.1
+pytest==7.4.4
+
+# Nota: Para desenvolvimento use 'poetry install'
+# Para produção use apenas as dependências principais
