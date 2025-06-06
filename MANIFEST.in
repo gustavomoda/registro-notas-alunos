@@ -1,0 +1,14 @@
+include README.md
+include LICENSE
+include requirements.txt
+include .env-sample
+include docker-compose.yml
+recursive-include registro_notas_alunos *.py
+recursive-include registro_notas_alunos/sql *.sql
+recursive-exclude test *
+recursive-exclude .venv *
+recursive-exclude __pycache__ *
+recursive-exclude *.pyc *
+recursive-exclude .git *
+recursive-exclude .pytest_cache *
+recursive-exclude .mypy_cache *

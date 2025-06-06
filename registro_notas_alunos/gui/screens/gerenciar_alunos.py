@@ -2,8 +2,8 @@ import logging
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from ...backend import AlunoService
-from ...backend.lib.database import DatabaseConnection
+from registro_notas_alunos.backend import AlunoService
+from registro_notas_alunos.backend.lib.database import DatabaseConnection
 
 logger = logging.getLogger(__name__)
 
@@ -48,9 +48,7 @@ class GerenciarAlunosScreen:
         main_frame.grid(row=0, column=0, sticky="nsew")
 
         # Título
-        title_label = ttk.Label(
-            main_frame, text="Gerenciar Alunos", font=("Arial", 16, "bold")
-        )
+        title_label = ttk.Label(main_frame, text="Gerenciar Alunos", font=("Arial", 16, "bold"))
         title_label.grid(row=0, column=0, columnspan=3, pady=(0, 20))
 
         # Frame para formulário
@@ -62,9 +60,7 @@ class GerenciarAlunosScreen:
         self.nome_entry = ttk.Entry(form_frame, width=40)
         self.nome_entry.grid(row=0, column=1, pady=5, padx=(10, 20))
 
-        ttk.Label(form_frame, text="Matrícula:").grid(
-            row=0, column=2, sticky=tk.W, pady=5
-        )
+        ttk.Label(form_frame, text="Matrícula:").grid(row=0, column=2, sticky=tk.W, pady=5)
         self.matricula_entry = ttk.Entry(form_frame, width=20)
         self.matricula_entry.grid(row=0, column=3, pady=5, padx=(10, 0))
 
@@ -98,9 +94,7 @@ class GerenciarAlunosScreen:
 
         # Treeview (tabela)
         columns = ("ID", "Nome", "Matrícula")
-        self.tree = ttk.Treeview(
-            table_frame, columns=columns, show="headings", height=12
-        )
+        self.tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=12)
 
         # Configurar colunas
         self.tree.heading("ID", text="ID")
@@ -112,9 +106,7 @@ class GerenciarAlunosScreen:
         self.tree.column("Matrícula", width=150, anchor=tk.CENTER)
 
         # Scrollbar para a tabela
-        scrollbar = ttk.Scrollbar(
-            table_frame, orient=tk.VERTICAL, command=self.tree.yview
-        )
+        scrollbar = ttk.Scrollbar(table_frame, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
 
         # Grid da tabela
@@ -149,9 +141,7 @@ class GerenciarAlunosScreen:
 
             # Inserir na tabela
             for aluno in alunos:
-                self.tree.insert(
-                    "", tk.END, values=(aluno.id, aluno.nome, aluno.matricula)
-                )
+                self.tree.insert("", tk.END, values=(aluno.id, aluno.nome, aluno.matricula))
 
             logger.info(f"Tabela de alunos atualizada - {len(alunos)} registros")
 
@@ -197,9 +187,7 @@ class GerenciarAlunosScreen:
             if "já existe" in error_msg:
                 messagebox.showerror("Erro", "Este aluno já existe!")
             else:
-                messagebox.showerror(
-                    "Erro", "Erro ao salvar, entre em contato com o Suporte"
-                )
+                messagebox.showerror("Erro", "Erro ao salvar, entre em contato com o Suporte")
 
     def alterar_aluno(self):
         """Altera o aluno selecionado"""
@@ -220,9 +208,7 @@ class GerenciarAlunosScreen:
             )
             self.refresh_table()
             self.limpar_campos()
-            logger.info(
-                f"Aluno alterado ID {self.selected_aluno}: {nome} - {matricula}"
-            )
+            logger.info(f"Aluno alterado ID {self.selected_aluno}: {nome} - {matricula}")
 
         except Exception as e:
             logger.error(f"Erro ao alterar aluno: {e}")
@@ -233,9 +219,7 @@ class GerenciarAlunosScreen:
             elif "não encontrado" in error_msg:
                 messagebox.showerror("Erro", "Aluno não encontrado!")
             else:
-                messagebox.showerror(
-                    "Erro", "Erro ao salvar, entre em contato com o Suporte"
-                )
+                messagebox.showerror("Erro", "Erro ao salvar, entre em contato com o Suporte")
 
     def excluir_aluno(self):
         """Exclui o aluno selecionado"""
@@ -256,9 +240,7 @@ class GerenciarAlunosScreen:
 
             except Exception as e:
                 logger.error(f"Erro ao excluir aluno: {e}")
-                messagebox.showerror(
-                    "Erro", "Erro ao salvar, entre em contato com o Suporte"
-                )
+                messagebox.showerror("Erro", "Erro ao salvar, entre em contato com o Suporte")
 
     def limpar_campos(self):
         """Limpa os campos do formulário"""

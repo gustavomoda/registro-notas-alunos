@@ -2,8 +2,8 @@ import logging
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from ...backend import DisciplinaService
-from ...backend.lib.database import DatabaseConnection
+from registro_notas_alunos.backend import DisciplinaService
+from registro_notas_alunos.backend.lib.database import DatabaseConnection
 
 logger = logging.getLogger(__name__)
 
@@ -48,9 +48,7 @@ class GerenciarDisciplinasScreen:
         title_label.grid(row=0, column=0, columnspan=4, pady=(0, 20))
 
         # Frame formulário
-        form_frame = ttk.LabelFrame(
-            main_frame, text="Dados da Disciplina", padding="10"
-        )
+        form_frame = ttk.LabelFrame(main_frame, text="Dados da Disciplina", padding="10")
         form_frame.grid(row=1, column=0, columnspan=4, sticky="ew", pady=(0, 15))
 
         # Campos
@@ -62,12 +60,8 @@ class GerenciarDisciplinasScreen:
         self.ano_entry = ttk.Entry(form_frame, width=10)
         self.ano_entry.grid(row=0, column=3, pady=5, padx=(10, 20))
 
-        ttk.Label(form_frame, text="Semestre:").grid(
-            row=0, column=4, sticky=tk.W, pady=5
-        )
-        self.semestre_combo = ttk.Combobox(
-            form_frame, values=["1", "2"], width=8, state="readonly"
-        )
+        ttk.Label(form_frame, text="Semestre:").grid(row=0, column=4, sticky=tk.W, pady=5)
+        self.semestre_combo = ttk.Combobox(form_frame, values=["1", "2"], width=8, state="readonly")
         self.semestre_combo.grid(row=0, column=5, pady=5, padx=(10, 0))
 
         # Botões
@@ -83,20 +77,14 @@ class GerenciarDisciplinasScreen:
         ]
 
         for i, (text, command) in enumerate(buttons):
-            ttk.Button(button_frame, text=text, command=command).grid(
-                row=0, column=i, padx=5
-            )
+            ttk.Button(button_frame, text=text, command=command).grid(row=0, column=i, padx=5)
 
         # Tabela
-        table_frame = ttk.LabelFrame(
-            main_frame, text="Lista de Disciplinas", padding="10"
-        )
+        table_frame = ttk.LabelFrame(main_frame, text="Lista de Disciplinas", padding="10")
         table_frame.grid(row=2, column=0, columnspan=4, sticky="nsew", pady=(0, 15))
 
         columns = ("ID", "Nome", "Ano", "Semestre")
-        self.tree = ttk.Treeview(
-            table_frame, columns=columns, show="headings", height=12
-        )
+        self.tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=12)
 
         # Configurar colunas
         for col in columns:
@@ -108,9 +96,7 @@ class GerenciarDisciplinasScreen:
         self.tree.column("Semestre", width=100, anchor=tk.CENTER)
 
         # Scrollbar
-        scrollbar = ttk.Scrollbar(
-            table_frame, orient=tk.VERTICAL, command=self.tree.yview
-        )
+        scrollbar = ttk.Scrollbar(table_frame, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
 
         self.tree.grid(row=0, column=0, sticky="nsew")
@@ -140,9 +126,7 @@ class GerenciarDisciplinasScreen:
             disciplinas = self.disciplina_service.listar_todas()
 
             for disc in disciplinas:
-                self.tree.insert(
-                    "", tk.END, values=(disc.id, disc.nome, disc.ano, disc.semestre)
-                )
+                self.tree.insert("", tk.END, values=(disc.id, disc.nome, disc.ano, disc.semestre))
 
             logger.info(f"Tabela disciplinas atualizada - {len(disciplinas)} registros")
 
@@ -191,15 +175,11 @@ class GerenciarDisciplinasScreen:
             if "já existe" in error_msg:
                 messagebox.showerror("Erro", "Esta disciplina já existe!")
             else:
-                messagebox.showerror(
-                    "Erro", "Erro ao salvar, entre em contato com o Suporte"
-                )
+                messagebox.showerror("Erro", "Erro ao salvar, entre em contato com o Suporte")
 
     def alterar_disciplina(self):
         """Altera disciplina selecionada"""
-        if not self.selected_disciplina or not isinstance(
-            self.selected_disciplina, int
-        ):
+        if not self.selected_disciplina or not isinstance(self.selected_disciplina, int):
             messagebox.showerror("Erro", "Selecione uma disciplina!")
             return
 
@@ -234,15 +214,11 @@ class GerenciarDisciplinasScreen:
             elif "não encontrada" in error_msg:
                 messagebox.showerror("Erro", "Disciplina não encontrada!")
             else:
-                messagebox.showerror(
-                    "Erro", "Erro ao salvar, entre em contato com o Suporte"
-                )
+                messagebox.showerror("Erro", "Erro ao salvar, entre em contato com o Suporte")
 
     def excluir_disciplina(self):
         """Exclui disciplina"""
-        if not self.selected_disciplina or not isinstance(
-            self.selected_disciplina, int
-        ):
+        if not self.selected_disciplina or not isinstance(self.selected_disciplina, int):
             messagebox.showerror("Erro", "Selecione uma disciplina!")
             return
 
@@ -258,9 +234,7 @@ class GerenciarDisciplinasScreen:
 
             except Exception as e:
                 logger.error(f"Erro ao excluir disciplina: {e}")
-                messagebox.showerror(
-                    "Erro", "Erro ao salvar, entre em contato com o Suporte"
-                )
+                messagebox.showerror("Erro", "Erro ao salvar, entre em contato com o Suporte")
 
     def limpar_campos(self):
         """Limpa campos"""

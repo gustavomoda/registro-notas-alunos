@@ -4,8 +4,8 @@ Serviço para operações com Aluno
 
 from typing import List, Optional
 
-from ..lib.database import DatabaseConnection
-from .model import Aluno
+from registro_notas_alunos.backend.aluno.model import Aluno
+from registro_notas_alunos.backend.lib.database import DatabaseConnection
 
 
 class AlunoService:
@@ -47,9 +47,7 @@ class AlunoService:
             raise Exception("Aluno já existe")
 
         try:
-            query = (
-                "INSERT INTO aluno (nome, matricula) VALUES (%s, %s) " "RETURNING id"
-            )
+            query = "INSERT INTO aluno (nome, matricula) VALUES (%s, %s) " "RETURNING id"
             result = self.db.execute_query(query, (aluno.nome, aluno.matricula))
 
             if not result:

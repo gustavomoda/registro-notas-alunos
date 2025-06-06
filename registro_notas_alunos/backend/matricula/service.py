@@ -4,8 +4,8 @@ Serviço para operações com Matrícula
 
 from typing import List, Optional, Tuple
 
-from ..lib.database import DatabaseConnection
-from .model import Matricula
+from registro_notas_alunos.backend.lib.database import DatabaseConnection
+from registro_notas_alunos.backend.matricula.model import Matricula
 
 
 class MatriculaJaExisteException(Exception):

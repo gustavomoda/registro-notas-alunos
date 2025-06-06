@@ -4,8 +4,8 @@ Serviço para operações com Disciplina
 
 from typing import List, Optional
 
-from ..lib.database import DatabaseConnection
-from .model import Disciplina
+from registro_notas_alunos.backend.disciplina.model import Disciplina
+from registro_notas_alunos.backend.lib.database import DatabaseConnection
 
 
 class DisciplinaService:
@@ -41,15 +41,12 @@ class DisciplinaService:
         disciplina = Disciplina(id=None, nome=nome, ano=ano, semestre=semestre)
 
         # Verifica se disciplina já existe
-        if self.buscar_por_nome_ano_semestre(
-            disciplina.nome, disciplina.ano, disciplina.semestre
-        ):
+        if self.buscar_por_nome_ano_semestre(disciplina.nome, disciplina.ano, disciplina.semestre):
             raise Exception("Disciplina já existe")
 
         try:
             query = (
-                "INSERT INTO disciplina (nome, ano, semestre) VALUES (%s, %s, %s) "
-                "RETURNING id"
+                "INSERT INTO disciplina (nome, ano, semestre) VALUES (%s, %s, %s) " "RETURNING id"
             )
             result = self.db.execute_query(
                 query, (disciplina.nome, disciplina.ano, disciplina.semestre)
@@ -176,10 +173,7 @@ class DisciplinaService:
 
         try:
             disciplina = Disciplina(id=id, nome=nome, ano=ano, semestre=semestre)
-            query = (
-                "UPDATE disciplina SET nome = %s, ano = %s, semestre = %s "
-                "WHERE id = %s"
-            )
+            query = "UPDATE disciplina SET nome = %s, ano = %s, semestre = %s " "WHERE id = %s"
             self.db.execute_query(
                 query,
                 (disciplina.nome, disciplina.ano, disciplina.semestre, disciplina.id),

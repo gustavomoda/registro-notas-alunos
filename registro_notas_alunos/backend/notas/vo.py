@@ -5,7 +5,7 @@ Value Objects para o módulo de Notas
 from dataclasses import dataclass
 from typing import Optional
 
-from ..disciplina.model import Disciplina
+from registro_notas_alunos.backend.disciplina.model import Disciplina
 
 
 @dataclass

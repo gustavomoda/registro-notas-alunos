@@ -4,10 +4,10 @@ Serviço para operações com Notas
 
 from typing import List, Optional, Tuple
 
-from ..disciplina.model import Disciplina
-from ..lib.database import DatabaseConnection
-from .model import Notas
-from .vo import AlunoNotaApuradoVO
+from registro_notas_alunos.backend.disciplina.model import Disciplina
+from registro_notas_alunos.backend.lib.database import DatabaseConnection
+from registro_notas_alunos.backend.notas.model import Notas
+from registro_notas_alunos.backend.notas.vo import AlunoNotaApuradoVO
 
 
 class NotasJaExistemException(Exception):

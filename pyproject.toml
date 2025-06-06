@@ -4,6 +4,10 @@ version = "0.1.0"
 description = "Sistema de registro de notas de alunos"
 authors = ["Your Name <your.email@example.com>"]
 readme = "README.md"
+packages = [{include = "registro_notas_alunos"}]
+
+[tool.poetry.scripts]
+registro-notas = "registro_notas_alunos.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"
