@@ -2,12 +2,8 @@ import logging
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from registro_notas_alunos.backend import (
-    AlunoService,
-    DisciplinaService,
-    MatriculaService,
-    NotasService,
-)
+from registro_notas_alunos.backend import (AlunoService, DisciplinaService,
+                                           MatriculaService, NotasService)
 from registro_notas_alunos.backend.lib.database import DatabaseConnection
 
 logger = logging.getLogger(__name__)

@@ -2,7 +2,8 @@ import logging
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from registro_notas_alunos.backend import AlunoService, MatriculaService, NotasService
+from registro_notas_alunos.backend import (AlunoService, MatriculaService,
+                                           NotasService)
 from registro_notas_alunos.backend.lib.database import DatabaseConnection
 from registro_notas_alunos.backend.notas.model import Notas
 from registro_notas_alunos.backend.notas.service import NotasJaExistemException

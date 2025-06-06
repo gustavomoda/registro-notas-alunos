@@ -13,8 +13,8 @@ Cada entidade tem seu próprio pacote com model e service:
 
 # Importa models
 from registro_notas_alunos.backend.aluno import Aluno, AlunoService
-from registro_notas_alunos.backend.disciplina import Disciplina, DisciplinaService
-
+from registro_notas_alunos.backend.disciplina import (Disciplina,
+                                                      DisciplinaService)
 # Importa infraestrutura
 from registro_notas_alunos.backend.lib.database import DatabaseConnection
 from registro_notas_alunos.backend.matricula import Matricula, MatriculaService
