@@ -3,16 +3,17 @@ import sys
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from registro_notas_alunos.gui.screens.gerenciar_alunos import \
-    GerenciarAlunosScreen
-from registro_notas_alunos.gui.screens.gerenciar_disciplinas import \
-    GerenciarDisciplinasScreen
-from registro_notas_alunos.gui.screens.gerenciar_matriculas import \
-    GerenciarMatriculasScreen
-from registro_notas_alunos.gui.screens.gerenciar_notas import \
-    GerenciarNotasScreen
-from registro_notas_alunos.gui.screens.relatorio_disciplina import \
-    RelatorioDisciplinaScreen
+from registro_notas_alunos.gui.screens.gerenciar_alunos import GerenciarAlunosScreen
+from registro_notas_alunos.gui.screens.gerenciar_disciplinas import (
+    GerenciarDisciplinasScreen,
+)
+from registro_notas_alunos.gui.screens.gerenciar_matriculas import (
+    GerenciarMatriculasScreen,
+)
+from registro_notas_alunos.gui.screens.gerenciar_notas import GerenciarNotasScreen
+from registro_notas_alunos.gui.screens.relatorio_disciplina import (
+    RelatorioDisciplinaScreen,
+)
 
 # Configurar logging para console
 logging.basicConfig(
@@ -48,8 +49,9 @@ class MainApp:
         """Aguarda conexão com banco em loop - não permite usar sem banco"""
         while True:
             try:
-                from registro_notas_alunos.backend.lib.database import \
-                    DatabaseConnection
+                from registro_notas_alunos.backend.lib.database import (
+                    DatabaseConnection,
+                )
 
                 db = DatabaseConnection()
                 with db.get_connection() as conn:
@@ -74,8 +76,7 @@ class MainApp:
     def check_backend_connection(self):
         """Verifica se é possível conectar ao banco de dados"""
         try:
-            from registro_notas_alunos.backend.lib.database import \
-                DatabaseConnection
+            from registro_notas_alunos.backend.lib.database import DatabaseConnection
 
             db = DatabaseConnection()
             with db.get_connection() as conn:
@@ -130,14 +131,14 @@ class MainApp:
 
     def create_menu_buttons(self, parent):
         """Cria os botões do menu principal"""
-        buttons = [
-            ("Cadastro de Alunos", self.open_gerenciar_alunos, 3),
-            ("Cadastro de Disciplinas", self.open_gerenciar_disciplinas, 4),
+        buttons = (
+            ("Cadastro de Disciplinas", self.open_gerenciar_disciplinas, 3),
+            ("Cadastro de Alunos", self.open_gerenciar_alunos, 4),
             ("Cadastro de Matrículas", self.open_gerenciar_matriculas, 5),
             ("Gerenciar Notas", self.open_gerenciar_notas, 6),
             ("Relatórios de Disciplinas", self.open_relatorio_disciplina, 7),
             ("Sair", self.quit_app, 9),
-        ]
+        )
 
         for text, command, row in buttons:
             btn = ttk.Button(parent, text=text, command=command, width=40)
