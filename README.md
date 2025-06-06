@@ -344,36 +344,26 @@ pytest --cov=backend
 pytest test_new_architecture.py -v
 ```
 
+# Telas
 
-## Próximos Passos
+#### Menu
+![image](https://github.com/user-attachments/assets/b2ce1294-8f14-455a-a3eb-01a2cd681f77)
 
-### Melhorias Planejadas
-- [ ] Implementar relatórios por disciplina
-- [ ] Adicionar backup/restore do banco
-- [ ] Criar API REST para integração
-- [ ] Implementar autenticação de usuários
-- [ ] Adicionar logs de auditoria
-- [ ] Criar dashboards com estatísticas
+![image](https://github.com/user-attachments/assets/fe326039-629e-4702-aba1-61bbb4bd8ffb)
 
-### Refatorações Técnicas
-- [ ] Adicionar mais testes unitários
-- [ ] Implementar CI/CD pipeline
-- [ ] Adicionar documentação API (Swagger)
-- [ ] Otimizar queries do banco de dados
+![image](https://github.com/user-attachments/assets/ab1ae47d-bfd0-4498-84ac-1b028f06a947)
+
+![image](https://github.com/user-attachments/assets/ea00099b-98fe-49f2-89f3-07df7834806f)
+
+![image](https://github.com/user-attachments/assets/820ff765-05b9-4478-a730-188a04bfb7dd)
+
+![image](https://github.com/user-attachments/assets/9224262c-5b80-4192-9b3f-0b52758d3171)
 
 
-## Contribuição
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
-3. Commit suas mudanças (`git commit -am 'Adiciona nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/nova-funcionalidade`)
-5. Abra um Pull Request
 
 
-## Licença
-
-Este projeto é desenvolvido para fins educacionais como parte do curso de **Análise e Desenvolvimento de Sistemas**.
 
 
-**Desenvolvido com arquitetura Package-as-Services seguindo princípios SOLID**
+
+
+
