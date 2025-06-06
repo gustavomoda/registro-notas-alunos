@@ -4,6 +4,12 @@ from tkinter import messagebox, ttk
 
 from registro_notas_alunos.backend import AlunoService
 from registro_notas_alunos.backend.lib.database import DatabaseConnection
+from registro_notas_alunos.gui.screens.exceptions import (
+    DatabaseConnectionError,
+    DataNotFoundError,
+    SelectionError,
+    ValidationError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -167,19 +173,25 @@ class GerenciarAlunosScreen:
 
     def incluir_aluno(self):
         """Inclui um novo aluno"""
-        nome = self.nome_entry.get().strip()
-        matricula = self.matricula_entry.get().strip()
-
-        if not nome or not matricula:
-            messagebox.showerror("Erro de Validação", "Preencha todos os campos!")
-            return
-
         try:
+            nome = self.nome_entry.get().strip()
+            matricula = self.matricula_entry.get().strip()
+
+            if not nome or not matricula:
+                raise ValidationError("Preencha todos os campos!")
+
             self.aluno_service.criar(nome=nome, matricula=matricula)
             self.refresh_table()
             self.limpar_campos()
             logger.info(f"Aluno incluído: {nome} - {matricula}")
+            messagebox.showinfo("Sucesso", "Aluno incluído com sucesso!")
 
+        except ValidationError as e:
+            logger.warning(f"Erro de validação: {e}")
+            messagebox.showerror("Erro de Validação", str(e))
+        except DatabaseConnectionError as e:
+            logger.error(f"Erro de conexão: {e}")
+            messagebox.showerror("Erro de Conexão", "Erro ao conectar com o banco de dados")
         except Exception as e:
             logger.error(f"Erro ao incluir aluno: {e}")
             error_msg = str(e)
@@ -187,29 +199,40 @@ class GerenciarAlunosScreen:
             if "já existe" in error_msg:
                 messagebox.showerror("Erro", "Este aluno já existe!")
             else:
-                messagebox.showerror("Erro", "Erro ao salvar, entre em contato com o Suporte")
+                messagebox.showerror("Erro", "Erro inesperado. Entre em contato com o Suporte")
 
     def alterar_aluno(self):
         """Altera o aluno selecionado"""
-        if not self.selected_aluno:
-            messagebox.showerror("Erro", "Selecione um aluno na tabela!")
-            return
-
-        nome = self.nome_entry.get().strip()
-        matricula = self.matricula_entry.get().strip()
-
-        if not nome or not matricula:
-            messagebox.showerror("Erro de Validação", "Preencha todos os campos!")
-            return
-
         try:
+            if not self.selected_aluno:
+                raise SelectionError("Selecione um aluno na tabela!")
+
+            nome = self.nome_entry.get().strip()
+            matricula = self.matricula_entry.get().strip()
+
+            if not nome or not matricula:
+                raise ValidationError("Preencha todos os campos!")
+
             self.aluno_service.atualizar(
                 id=int(self.selected_aluno), nome=nome, matricula=matricula
             )
             self.refresh_table()
             self.limpar_campos()
             logger.info(f"Aluno alterado ID {self.selected_aluno}: {nome} - {matricula}")
+            messagebox.showinfo("Sucesso", "Aluno alterado com sucesso!")
 
+        except SelectionError as e:
+            logger.warning(f"Erro de seleção: {e}")
+            messagebox.showerror("Erro de Seleção", str(e))
+        except ValidationError as e:
+            logger.warning(f"Erro de validação: {e}")
+            messagebox.showerror("Erro de Validação", str(e))
+        except DataNotFoundError as e:
+            logger.warning(f"Dados não encontrados: {e}")
+            messagebox.showerror("Erro", "Aluno não encontrado!")
+        except DatabaseConnectionError as e:
+            logger.error(f"Erro de conexão: {e}")
+            messagebox.showerror("Erro de Conexão", "Erro ao conectar com o banco de dados")
         except Exception as e:
             logger.error(f"Erro ao alterar aluno: {e}")
             error_msg = str(e)
@@ -219,7 +242,7 @@ class GerenciarAlunosScreen:
             elif "não encontrado" in error_msg:
                 messagebox.showerror("Erro", "Aluno não encontrado!")
             else:
-                messagebox.showerror("Erro", "Erro ao salvar, entre em contato com o Suporte")
+                messagebox.showerror("Erro", "Erro inesperado. Entre em contato com o Suporte")
 
     def excluir_aluno(self):
         """Exclui o aluno selecionado"""

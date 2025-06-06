@@ -6,33 +6,14 @@ from registro_notas_alunos.backend import AlunoService, MatriculaService, NotasS
 from registro_notas_alunos.backend.lib.database import DatabaseConnection
 from registro_notas_alunos.backend.notas.model import Notas
 from registro_notas_alunos.backend.notas.service import NotasJaExistemException
+from registro_notas_alunos.gui.screens.exceptions import (
+    DatabaseConnectionError,
+    DataNotFoundError,
+    SelectionError,
+    ValidationError,
+)
 
 logger = logging.getLogger(__name__)
-
-
-# Exceções específicas para a GUI
-class ValidationError(Exception):
-    """Erro de validação de dados de entrada"""
-
-    pass
-
-
-class DataNotFoundError(Exception):
-    """Erro quando dados esperados não são encontrados"""
-
-    pass
-
-
-class SelectionError(Exception):
-    """Erro relacionado à seleção de itens na interface"""
-
-    pass
-
-
-class DatabaseConnectionError(Exception):
-    """Erro de conexão com banco de dados"""
-
-    pass
 
 
 class GerenciarNotasScreen:
