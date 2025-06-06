@@ -40,16 +40,16 @@ class Notas:
 
     def _validar_notas(self):
         """Valida se as notas estão dentro dos limites permitidos"""
-        if not (0.0 <= self.sm1 <= 1.0):
+        if not self.sm1 or not (0.0 <= self.sm1 <= 1.0):
             raise ValueError("SM1 deve estar entre 0.0 e 1.0")
 
-        if not (0.0 <= self.sm2 <= 1.0):
+        if not self.sm2 or not (0.0 <= self.sm2 <= 1.0):
             raise ValueError("SM2 deve estar entre 0.0 e 1.0")
 
-        if not (0.0 <= self.av <= 10.0):
+        if not self.av or not (0.0 <= self.av <= 10.0):
             raise ValueError("AV deve estar entre 0.0 e 10.0")
 
-        if not (0.0 <= self.avs <= 10.0):
+        if self.avs and not (0.0 <= self.avs <= 10.0):
             raise ValueError("AVS deve estar entre 0.0 e 10.0")
 
     def calcular_nota_final(self) -> float:
