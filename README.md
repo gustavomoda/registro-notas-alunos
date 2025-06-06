@@ -18,10 +18,18 @@ Sistema completo para registro e controle de notas acadêmicas, implementado com
 - [8. Interface Gráfica](#interface-grafica)
 - [9. Funcionalidades Implementadas](#funcionalidades-implementadas)
 
+### Telas do Sistema
+- [10. Menu Principal](#menu-principal)
+- [11. Cadastro de Alunos](#cadastro-de-alunos)
+- [12. Cadastro de Disciplinas](#cadastro-de-disciplinas)
+- [13. Matricular Alunos](#matricular-alunos)
+- [14. Sistema de Notas Avançado](#sistema-de-notas-avancado)
+- [15. Consulta de Notas Inteligente](#consulta-de-notas-inteligente)
+
 ### Documentação Técnica
-- [10. Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [11. Arquitetura e Padrões](#arquitetura-e-padroes)
-- [12. Testes](#testes)
+- [16. Tecnologias Utilizadas](#tecnologias-utilizadas)
+- [17. Arquitetura e Padrões](#arquitetura-e-padroes)
+- [18. Testes](#testes)
 
 
 ## Visão Geral da Arquitetura
@@ -344,26 +352,55 @@ pytest --cov=backend
 pytest test_new_architecture.py -v
 ```
 
-# Telas
+# Telas do Sistema
 
-#### Menu
+## Menu Principal
+
+- Interface limpa e intuitiva com botões organizados
+- Menu principal com acesso a todas as funcionalidades do sistema
+- Design moderno seguindo padrões de UX brasileiros
+
 ![image](https://github.com/user-attachments/assets/b2ce1294-8f14-455a-a3eb-01a2cd681f77)
+
+
+## Cadastro de Alunos
+- Validação completa de dados de entrada
+- Tratamento de erros padronizado ("Erro ao salvar, entre em contato com o Suporte")
+- Prevenção contra duplicatas com mensagem informativa
+- Interface responsiva com campos obrigatórios claramente identificados
 
 ![image](https://github.com/user-attachments/assets/fe326039-629e-4702-aba1-61bbb4bd8ffb)
 
+
+## Cadastro de Disciplinas
+- Formulário com validação de ano/semestre no formato brasileiro (2024/1, 2024/2)
+- Controle de duplicatas por período acadêmico
+- Mensagens de erro consistentes em todo o sistema
+- Integração completa com a arquitetura Package-as-Services
 ![image](https://github.com/user-attachments/assets/ab1ae47d-bfd0-4498-84ac-1b028f06a947)
 
+
+### Matricular Alunos
+- Seleção dinâmica de alunos e disciplinas disponíveis
+- Validação contra matrículas duplicadas com `MatriculaJaExisteException`
+- Mensagem informativa em azul para duplicatas (não erro crítico)
+- Atualização automática das listas após operações
 ![image](https://github.com/user-attachments/assets/ea00099b-98fe-49f2-89f3-07df7834806f)
 
+
+### Sistema de Notas Avançado
+- **Nova fórmula brasileira:** `NF = SM1 + SM2 + max(AV, AVS)`
+- **Validação de limites:** SM1/SM2 ≤ 1,0 | AV/AVS ≤ 10,0
+- **Localização brasileira:** Entrada e exibição com vírgula (3,20)
+- **Cores inteligentes:** Verde (aprovado), vermelho (reprovado), laranja (pendente)
+- Value Object `AlunoNotaApuradoVO` com lógica de negócio encapsulada
 ![image](https://github.com/user-attachments/assets/820ff765-05b9-4478-a730-188a04bfb7dd)
 
+
+### Consulta de Notas Inteligente
+- **Tabela completa** com informações da disciplina (ano/semestre)
+- **Situação colorida:** Aprovado, Reprovado, Pendente (visual imediato)
+- **Formatação brasileira:** Todas as notas exibidas com vírgula
+- **Cálculo inteligente:** NF calculada automaticamente com nova fórmula
+- **Detalhamento completo:** SM1, SM2, AV, AVS, NF e situação em uma única view
 ![image](https://github.com/user-attachments/assets/9224262c-5b80-4192-9b3f-0b52758d3171)
-
-
-
-
-
-
-
-
-
