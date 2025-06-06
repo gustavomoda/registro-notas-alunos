@@ -44,31 +44,7 @@
     // === FILTROS DE ARQUIVOS ===
     "files.exclude": {
         "**/__pycache__": true,
-        "**/*.pyc": true,
-        "**/*.pyo": true,
-        "**/*.pyd": true,
-        "**/.Python": true,
-        "**/build": true,
-        "**/develop-eggs": true,
-        "**/dist": true,
-        "**/downloads": true,
-        "**/eggs": true,
-        "**/.eggs": true,
-        "**/lib": true,
-        "**/lib64": true,
-        "**/parts": true,
-        "**/sdist": true,
-        "**/var": true,
-        "**/wheels": true,
-        "**/*.egg-info": true,
-        "**/.installed.cfg": true,
-        "**/*.egg": true,
-        "**/.pytest_cache": true,
-        "**/.coverage": true,
-        "**/htmlcov": true,
-        "**/.mypy_cache": true,
-        "**/.dmypy.json": true,
-        "**/.vscode/.ropeproject": true
+        "**/.mypy_cache": true
     },
     "search.exclude": {
         "**/__pycache__": true,

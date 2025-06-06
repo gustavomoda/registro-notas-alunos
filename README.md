@@ -135,44 +135,6 @@ O sistema conecta automaticamente em:
 - **Usuário:** postgres
 - **Senha:** postgres123
 
-### Dados de Exemplo
-O banco é inicializado automaticamente com dados de exemplo incluindo:
-
-#### **10 Alunos com Perfis Variados:**
-- **Tony Stark** (2025001) - Engenheiro brilhante mas inconsistente
-- **Steve Rogers** (2025002) - Líder disciplinado, consistentemente bom
-- **Natasha Romanoff** (2025003) - Estratégica, boa em tudo
-- **Bruce Banner** (2025004) - Cientista instável, altos e baixos
-- **Thor Odinson** (2025005) - Guerreiro nobre, esforçado mas não acadêmico
-- **Clint Barton** (2025006) - Precisão sob pressão, irregular
-- **Wanda Maximoff** (2025007) - Poder instável, excelente ou regular
-- **Peter Parker** (2025008) - Jovem prodígio, bom mas aprendendo
-- **Carol Danvers** (2025009) - Líder exemplar, consistentemente excelente
-- **Stephen Strange** (2025010) - Perfeccionista, excelente mas crítico
-
-#### **Disciplinas por Período:**
-**2025/1 (Atual):**
-- RAD em Python
-- Álgebra Linear
-- POO em Java
-- Estrutura Dados em C
-- Banco de Dados
-- Engenharia de Software
-
-**2025/2:**
-- Mesmas disciplinas do semestre anterior
-
-**2024/2 (Histórico):**
-- Fundamentos de Programação
-- Matemática Discreta
-- Lógica de Programação
-
-#### **Notas Randomizadas:**
-- **Notas realistas** com variação natural por perfil de aluno
-- **Diferentes desempenhos** por disciplina baseados na personalidade
-- **Histórico acadêmico** com dados do semestre anterior
-- **AVS (Prova Substitutiva)** aplicada estrategicamente
-- **Situações variadas:** Aprovado, Reprovado, Pendente
 
 ### Reinicializar Dados
 ```bash
@@ -220,7 +182,7 @@ O projeto inclui configurações otimizadas para VS Code:
   - Import Sorter
   - Linter
   - Type Checker
-  - Python Debugger
+  - Python DebuggerX-
 
 #### **Container & Version Control:**
   - Docker Support
@@ -416,3 +378,9 @@ pytest test_new_architecture.py -v
 - **Cálculo inteligente:** NF calculada automaticamente com nova fórmula
 - **Detalhamento completo:** SM1, SM2, AV, AVS, NF e situação em uma única view
 ![image](https://github.com/user-attachments/assets/9224262c-5b80-4192-9b3f-0b52758d3171)
+
+
+### Autores
+- Luis Gustavo Moda <gustavo.moda@gmail.com>
+- Ganriel Baptista <gabrielbaptistams@gmail.com>
+- João Pedro Borges
