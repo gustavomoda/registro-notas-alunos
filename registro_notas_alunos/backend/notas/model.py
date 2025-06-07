@@ -24,10 +24,10 @@ class Notas:
 
     id: Optional[int]
     id_matricula: int
-    sm1: float = 0.0
-    sm2: float = 0.0
-    av: float = 0.0
-    avs: float = 0.0
+    sm1: Optional[float] = 0.0
+    sm2: Optional[float] = 0.0
+    av: Optional[float] = 0.0
+    avs: Optional[float] = 0.0
     nf: float = 0.0
     situacao: str = "Em Avaliação"
 
@@ -40,16 +40,16 @@ class Notas:
 
     def _validar_notas(self):
         """Valida se as notas estão dentro dos limites permitidos"""
-        if not self.sm1 or not (0.0 <= self.sm1 <= 1.0):
+        if self.sm1 is not None and not (0.0 <= self.sm1 <= 1.0):
             raise ValueError("SM1 deve estar entre 0.0 e 1.0")
 
-        if not self.sm2 or not (0.0 <= self.sm2 <= 1.0):
+        if self.sm2 is not None and not (0.0 <= self.sm2 <= 1.0):
             raise ValueError("SM2 deve estar entre 0.0 e 1.0")
 
-        if not self.av or not (0.0 <= self.av <= 10.0):
+        if self.av is not None and not (0.0 <= self.av <= 10.0):
             raise ValueError("AV deve estar entre 0.0 e 10.0")
 
-        if self.avs and not (0.0 <= self.avs <= 10.0):
+        if self.avs is not None and not (0.0 <= self.avs <= 10.0):
             raise ValueError("AVS deve estar entre 0.0 e 10.0")
 
     def calcular_nota_final(self) -> float:
@@ -59,11 +59,15 @@ class Notas:
         Returns:
             float: Nota final calculada
         """
-        # Usa AVS se for maior que AV
-        nota_av = max(self.av, self.avs)
+        # Usa AVS se for maior que AV, tratando None como 0
+        av_valor = self.av if self.av is not None else 0.0
+        avs_valor = self.avs if self.avs is not None else 0.0
+        nota_av = max(av_valor, avs_valor)
 
-        # Calcula pontos extras (máximo 2 pontos)
-        pontos_extras = min(self.sm1, 1.0) + min(self.sm2, 1.0)
+        # Calcula pontos extras (máximo 2 pontos), tratando None como 0
+        sm1_valor = self.sm1 if self.sm1 is not None else 0.0
+        sm2_valor = self.sm2 if self.sm2 is not None else 0.0
+        pontos_extras = min(sm1_valor, 1.0) + min(sm2_valor, 1.0)
 
         # Nota final é a soma da nota AV com os pontos extras
         self.nf = nota_av + pontos_extras

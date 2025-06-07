@@ -55,7 +55,7 @@ class TestMatriculaService:
         service = MatriculaService(mock_db)
         matricula = Matricula(id=None, id_aluno=1, id_disciplina=1)
 
-        with pytest.raises(Exception, match="Matrícula já existe"):
+        with pytest.raises(Exception, match="O aluno já está matriculado nesta disciplina"):
             service.criar(matricula)
 
     def test_criar_matricula_com_id(self):
